@@ -21,7 +21,7 @@ SITE_ID = 1
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_DIR = os.path.join(BASE_DIR, "..")
+PROJECT_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
 
 # Admins
 try:
@@ -162,6 +162,13 @@ MEDIA_LOGS = os.path.abspath(os.path.join(MEDIA_ROOT, 'logs'))
 
 if not os.path.exists(MEDIA_LOGS):
 	os.makedirs(MEDIA_LOGS)
+
+if not os.path.exists(STATIC_ROOT):
+	os.makedirs(STATIC_ROOT)
+
+for static_dirs in STATICFILES_DIRS:
+	if not os.path.exists(static_dirs):
+		os.makedirs(static_dirs)
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'

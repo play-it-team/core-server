@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Local" pattern="(file[core-server]:*/||file[core-server]:*)&amp;&amp;!file[core-server]:.idea//*" />
+</component>

@@ -28,6 +28,3 @@ script:
   - coverage report
   - coverage xml
   - python-codacy-coverage -r coverage.xml
-
-after_success:
-  - coveralls

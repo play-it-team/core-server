@@ -157,14 +157,16 @@ class Geoname(object):
 		for file_name in file_names:
 			urls = [e.format(file_name=file_name) for e in self.files[file_key]['urls']]
 			content = None
+			url = None
 			for url in urls:
 				try:
 					content = urlopen(url=url)
-					if ['text/plain', 'application/zip'] not in content.headers['Content-Type']:
+					if content.headers['Content-Type'] not in ['text/plain; charset=utf-8', 'application/zip']:
 						raise Exception(
 								"Content type of downloaded file was {}".format(content.headers['Content-Type']))
 					logger.debug("Downloaded: {}".format(url))
-				except Exception:
+				except Exception as e:
+					print(e)
 					content = None
 					continue
 
