@@ -6,7 +6,7 @@ from django.db import models
 # Create your models here.
 class Artist(models.Model):
 	id = models.CharField(max_length=200, db_index=True, primary_key=True)
-	name = models.CharField(max_length=200, db_index=True)
+	name = models.CharField(max_length=500, db_index=True)
 
 	class Meta:
 		ordering = ['name']

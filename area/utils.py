@@ -230,6 +230,8 @@ class Geoname(object):
 			for continent in tqdm(ContinentEnum.choices(), disable=self.quiet, total=len(ContinentEnum.choices()),
 			                      desc="Importing continents"):
 				Continent.objects.update_or_create(code=continent[0], defaults={'name': continent[1]})
+		else:
+			logger.info("Database is already up-to-date")
 
 	def import_country(self):
 		file_key = 'country'
@@ -264,6 +266,8 @@ class Geoname(object):
 
 				country, created = Country.objects.update_or_create(id=country_id, defaults=defaults)
 				logger.debug("%s country '%s'", "Added" if created else "Updated", defaults['name'])
+		else:
+			logger.info("Database is already up-to-date")
 
 		self.__skipped_count_json()
 
@@ -324,6 +328,8 @@ class Geoname(object):
 						json.dump(countries_not_found, fp=file_pointer, sort_keys=True, indent=4)
 				except Exception as e:
 					logger.warning("Unable to write log file '%s': %s", countries_not_found_file, e)
+		else:
+			logger.info("Database is already up-to-date")
 
 		self.__skipped_count_json()
 
@@ -382,6 +388,8 @@ class Geoname(object):
 
 				city, created = City.objects.update_or_create(id=city_id, defaults=defaults)
 				logger.debug("%s city: %s", "Added" if created else "Updated", city.__str__())
+		else:
+			logger.info("Database is already up-to-date")
 		self.__skipped_count_json()
 
 	def flush_continent(self):

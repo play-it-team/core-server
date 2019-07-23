@@ -102,6 +102,8 @@ class Artists(object):
 
 				artist, created = Artist.objects.update_or_create(id=artist_id, defaults=defaults)
 				logger.debug("%s artist '%s'", "Added" if created else "Updated", defaults['name'])
+		else:
+			logger.info("Database is already up-to-date")
 
 	def flush_artist(self):
 		logger.info("Flushing artist data")
