@@ -139,6 +139,9 @@ class Geoname(object):
 		self.data_dir = os.path.join(django_settings.MEDIA_ROOT, 'geoname')
 		self.quiet = quiet
 		self.force = force
+		self.count_country = 0
+		self.count_region = 0
+		self.count_city = 0
 
 	def import_options(self):
 		return [
@@ -202,6 +205,27 @@ class Geoname(object):
 				if not row.startswith('#'):
 					yield dict(list(zip(self.files[file_key]['fields'], row.rstrip('\n').split('\t'))))
 
+	def __skipped_count_json(self, read=None):
+		if read is not None:
+			try:
+				with open(os.path.join(self.data_dir, "skipped_count.json"), "r") as fp:
+					skipped_count = json.load(fp)[str(read)]
+			except KeyError:
+				skipped_count = 0
+
+			return skipped_count
+		else:
+			count = {
+					"country": self.count_country,
+					"region":  self.count_region,
+					"city":    self.count_city
+			}
+
+			with open(os.path.join(self.data_dir, "skipped_count.json"), "w+") as fp:
+				json.dump(count, fp)
+
+			return None
+
 	def import_continent(self):
 		if Continent.objects.count() != len(ContinentEnum.choices()) or self.force:
 			for continent in tqdm(ContinentEnum.choices(), disable=self.quiet, total=len(ContinentEnum.choices()),
@@ -218,15 +242,17 @@ class Geoname(object):
 
 		continents = {c.code: c.name for c in Continent.objects.all()}
 
-		if Country.objects.count() != total_count or self.force:
+		if (Country.objects.count() - self.__skipped_count_json(read=file_key)) != total_count or self.force:
 			for item in tqdm(data, disable=self.quiet, total=total_count, desc="Importing countries"):
 				try:
 					country_id = int(item['geonameid'])
 				except KeyError:
 					logger.warning('Country has no Geo name ID: %s --skipping' % item['name'])
+					self.count_country += 1
 					continue
 				except ValueError:
 					logger.warning('Country has non-numeric Geo name ID: %s --skipping' % item['geonameid'])
+					self.count_country += 1
 					continue
 
 				defaults = {
@@ -239,6 +265,8 @@ class Geoname(object):
 
 				country, created = Country.objects.update_or_create(id=country_id, defaults=defaults)
 				logger.debug("%s country '%s'", "Added" if created else "Updated", defaults['name'])
+
+				self.__skipped_count_json()
 
 	def __build_country_index__(self):
 		self.country_index = {}
@@ -258,15 +286,17 @@ class Geoname(object):
 
 		countries_not_found = {}
 
-		if Region.objects.count() != total_count or self.force:
+		if (Region.objects.count() - self.__skipped_count_json(read=file_key)) != total_count or self.force:
 			for item in tqdm(data, disable=self.quiet, total=total_count, desc="Importing regions"):
 				try:
 					region_id = int(item['geonameid'])
 				except KeyError:
 					logger.warning('Region has no Geo name ID: %s --skipping' % item['name'])
+					self.count_region += 1
 					continue
 				except ValueError:
 					logger.warning('Region has non-numeric Geo name ID: %s --skipping' % item['geonameid'])
+					self.count_region += 1
 					continue
 
 				country_code, region_code = item['code'].split('.')
@@ -311,15 +341,17 @@ class Geoname(object):
 		total_count = sum(1 for _ in data)
 		data = self.__get_data__(file_key=file_key)
 
-		if City.objects.count() != total_count or self.force:
+		if (City.objects.count() - self.__skipped_count_json(read=file_key)) != total_count or self.force:
 			for item in tqdm(data, disable=self.quiet, total=total_count, desc="Importing cities"):
 				try:
 					city_id = int(item['geonameid'])
 				except KeyError:
 					logger.warning('City has no Geo name ID: %s --skipping' % item['name'])
+					self.count_city += 1
 					continue
 				except ValueError:
 					logger.warning('City has non-numeric Geo name ID: %s --skipping' % item['geonameid'])
+					self.count_city += 1
 					continue
 
 				defaults = {
@@ -350,15 +382,19 @@ class Geoname(object):
 	def flush_continent(self):
 		logger.info("Flushing continent data")
 		Continent.objects.all().delete()
+		self.__skipped_count_json()
 
 	def flush_country(self):
 		logger.info("Flushing country data")
 		Country.objects.all().delete()
+		self.__skipped_count_json()
 
 	def flush_region(self):
 		logger.info("Flushing region data")
 		Region.objects.all().delete()
+		self.__skipped_count_json()
 
 	def flush_city(self):
 		logger.info("Flushing city data")
 		City.objects.all().delete()
+		self.__skipped_count_json()
