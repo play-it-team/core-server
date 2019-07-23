@@ -62,7 +62,12 @@ LOGGING = {
 						'propagate': True,
 						'level':     'INFO'
 				},
-				'common': {
+				'area':   {
+						'handlers':  ['console', 'file', 'mail_admins'],
+						'propagate': True,
+						'level':     DJANGO_LOG_LEVEL
+				},
+				'artist': {
 						'handlers':  ['console', 'file', 'mail_admins'],
 						'propagate': True,
 						'level':     DJANGO_LOG_LEVEL
