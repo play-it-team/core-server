@@ -165,16 +165,15 @@ class Geoname(object):
 				try:
 					content = urlopen(url=url)
 					if content.headers['Content-Type'] not in ['text/plain; charset=utf-8', 'application/zip']:
-						raise Exception(
-								"Content type of downloaded file was {}".format(content.headers['Content-Type']))
-					logger.debug("Downloaded: {}".format(url))
+						raise Exception("content type of downloaded file was %s", content.headers['Content-Type'])
+					logger.debug("Downloaded: %s", url)
 				except Exception as e:
-					print(e)
+					logger.warning(e)
 					content = None
 					continue
 
 			if content is not None:
-				logger.debug("Saving: {}/{}".format(self.data_dir, file_name))
+				logger.debug("Saving: %s/%s", self.data_dir, file_name)
 				if not os.path.exists(self.data_dir):
 					os.makedirs(self.data_dir)
 
@@ -182,17 +181,17 @@ class Geoname(object):
 					file.write(content.read())
 
 			if not os.path.exists(os.path.join(self.data_dir, file_name)):
-				raise Exception("File not found and download failed: {} [{}]".format(file_name, url))
+				raise Exception("File not found and download failed: %s [%s]", file_name, url)
 
 	def __get_data__(self, file_key):
 		if 'file_name' in self.files[file_key]:
 			file_names = [self.files[file_key]['file_name']]
 		else:
-			file_names = self.files[file_key]['file_names']
+			raise Exception("'file_name' key is missing from %s", self.files[file_key])
 
 		for file_name in file_names:
 			name, ext = file_name.rsplit('.', 1)
-			logger.debug("Reading: {}/{}".format(self.data_dir, file_name))
+			logger.debug("Reading: %s/%s", self.data_dir, file_name)
 
 			if ext == 'zip':
 				file_path = os.path.join(self.data_dir, file_name)
@@ -242,7 +241,7 @@ class Geoname(object):
 
 		continents = {c.code: c.name for c in Continent.objects.all()}
 
-		if (Country.objects.count() - self.__skipped_count_json(read=file_key)) != total_count or self.force:
+		if (Country.objects.count() + self.__skipped_count_json(read=file_key)) != total_count or self.force:
 			for item in tqdm(data, disable=self.quiet, total=total_count, desc="Importing countries"):
 				try:
 					country_id = int(item['geonameid'])
@@ -266,7 +265,7 @@ class Geoname(object):
 				country, created = Country.objects.update_or_create(id=country_id, defaults=defaults)
 				logger.debug("%s country '%s'", "Added" if created else "Updated", defaults['name'])
 
-				self.__skipped_count_json()
+		self.__skipped_count_json()
 
 	def __build_country_index__(self):
 		self.country_index = {}
@@ -286,7 +285,7 @@ class Geoname(object):
 
 		countries_not_found = {}
 
-		if (Region.objects.count() - self.__skipped_count_json(read=file_key)) != total_count or self.force:
+		if (Region.objects.count() + self.__skipped_count_json(read=file_key)) != total_count or self.force:
 			for item in tqdm(data, disable=self.quiet, total=total_count, desc="Importing regions"):
 				try:
 					region_id = int(item['geonameid'])
@@ -312,6 +311,7 @@ class Geoname(object):
 				except KeyError:
 					countries_not_found.setdefault(country_code, []).append(defaults['name'])
 					logger.warning("Region: %s: Cannot find country: %s --skipping", defaults['name'], country_code)
+					self.count_region += 1
 					continue
 
 				region, created = Region.objects.update_or_create(id=region_id, defaults=defaults)
@@ -324,6 +324,8 @@ class Geoname(object):
 						json.dump(countries_not_found, fp=file_pointer, sort_keys=True, indent=4)
 				except Exception as e:
 					logger.warning("Unable to write log file '%s': %s", countries_not_found_file, e)
+
+		self.__skipped_count_json()
 
 	def __build_region_index__(self):
 		self.region_index = {}
@@ -341,7 +343,7 @@ class Geoname(object):
 		total_count = sum(1 for _ in data)
 		data = self.__get_data__(file_key=file_key)
 
-		if (City.objects.count() - self.__skipped_count_json(read=file_key)) != total_count or self.force:
+		if (City.objects.count() + self.__skipped_count_json(read=file_key)) != total_count or self.force:
 			for item in tqdm(data, disable=self.quiet, total=total_count, desc="Importing cities"):
 				try:
 					city_id = int(item['geonameid'])
@@ -365,6 +367,7 @@ class Geoname(object):
 					defaults['country'] = country
 				except KeyError:
 					logger.warning("City: %s: Cannot find country: %s --skipping", item['name'], country_code)
+					self.count_city += 1
 					continue
 
 				region_code = item['admin1Code']
@@ -374,10 +377,12 @@ class Geoname(object):
 					defaults['region'] = region
 				except KeyError:
 					logger.warning("City: %s: Cannot find region: %s --skipping", item['name'], region_code)
+					self.count_city += 1
 					continue
 
 				city, created = City.objects.update_or_create(id=city_id, defaults=defaults)
 				logger.debug("%s city: %s", "Added" if created else "Updated", city.__str__())
+		self.__skipped_count_json()
 
 	def flush_continent(self):
 		logger.info("Flushing continent data")
