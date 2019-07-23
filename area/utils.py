@@ -8,6 +8,7 @@ import zipfile
 from urllib.request import urlopen
 
 from django.conf import settings as django_settings
+from django.contrib.gis.geos import Point
 from tqdm import tqdm
 
 from area.enums import ContinentEnum
@@ -364,7 +365,8 @@ class Geoname(object):
 
 				defaults = {
 						'name':      item['name'],
-						'asciiName': item['asciiName']
+						'asciiName': item['asciiName'],
+						'location':  Point(float(item['latitude']), float(item['longitude']))
 				}
 
 				country_code = item['countryCode']

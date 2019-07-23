@@ -1,6 +1,6 @@
 #  Copyright (c) 2019 - 2019. Abhimanyu Saharan <desk.abhimanyu@gmail.com> and the Play.It contributors
 
-from django.db import models
+from django.contrib.gis.db import models
 
 
 # Create your models here.
@@ -64,6 +64,7 @@ class City(models.Model):
 	asciiName = models.CharField(max_length=200, db_index=True)
 	country = models.ForeignKey(to=Country, related_name='cities', on_delete=models.CASCADE)
 	region = models.ForeignKey(to=Region, related_name='cities', on_delete=models.CASCADE, null=True, blank=True)
+	location = models.PointField(null=True, blank=True)
 
 	class Meta:
 		ordering = ['name']
