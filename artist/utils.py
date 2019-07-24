@@ -20,7 +20,7 @@ class Artists(object):
 		}
 
 		self.files = {
-				'artist': {
+				'artist':          {
 						'file_name': 'unique_artists.txt',
 						'urls':      [self.export_url['additional'] + '{file_name}'],
 						'fields':    [
@@ -29,22 +29,32 @@ class Artists(object):
 								'track_id',
 								'artist_name'
 						]
+				},
+				'artist_location': {
+						'file_name': 'artist_location.txt',
+						'urls':      [self.export_url['additional'] + '{file_name}'],
+						'fields':    [
+								'artist_id',
+								'latitude',
+								'longitude',
+								'artist_name',
+								'city'
+						]
 				}
 		}
 
 		self.data_dir = os.path.join(django_settings.MEDIA_ROOT, 'msd')
-		self.file_key = 'artist'
 		self.quiet = quiet
 		self.force = force
 
-	def __download_file__(self):
-		if 'file_name' in self.files[self.file_key]:
-			file_names = [self.files[self.file_key]['file_name']]
+	def __download_file__(self, file_key):
+		if 'file_name' in self.files[file_key]:
+			file_names = [self.files[file_key]['file_name']]
 		else:
-			raise Exception("'file_name' key is missing from %s", self.files[self.file_key])
+			raise Exception("'file_name' key is missing from %s", self.files[file_key])
 
 		for file_name in file_names:
-			urls = [e.format(file_name=file_name) for e in self.files[self.file_key]['urls']]
+			urls = [e.format(file_name=file_name) for e in self.files[file_key]['urls']]
 			content = None
 			url = None
 
@@ -69,11 +79,11 @@ class Artists(object):
 			if not os.path.exists(os.path.join(self.data_dir, file_name)):
 				raise Exception("File not found and download failed: %s [%s]", file_name, url)
 
-	def __get_data__(self):
-		if 'file_name' in self.files[self.file_key]:
-			file_names = [self.files[self.file_key]['file_name']]
+	def __get_data__(self, file_key):
+		if 'file_name' in self.files[file_key]:
+			file_names = [self.files[file_key]['file_name']]
 		else:
-			raise Exception("'file_name' key is missing from %s", self.files[self.file_key])
+			raise Exception("'file_name' key is missing from %s", self.files[file_key])
 
 		for file_name in file_names:
 			logger.debug("Reading: %s/%s", self.data_dir, file_name)
@@ -81,27 +91,28 @@ class Artists(object):
 			file_obj = io.open(os.path.join(self.data_dir, file_name), 'r', encoding='utf-8')
 
 			for row in file_obj:
-				yield dict(list(zip(self.files[self.file_key]['fields'], row.strip('\n').split('<SEP>'))))
+				yield dict(list(zip(self.files[file_key]['fields'], row.strip('\n').split('<SEP>'))))
 
 	def import_options(self):
 		return ['artist']
 
 	def import_artist(self):
-		self.__download_file__()
-		data = self.__get_data__()
+		self.__download_file__(file_key='artist')
+		data = self.__get_data__(file_key='artist')
 		total_count = sum(1 for _ in data)
-		data = self.__get_data__()
+		data = self.__get_data__(file_key='artist')
 
 		if Artist.objects.count() != total_count or self.force:
 			for item in tqdm(data, disable=self.quiet, total=total_count, desc="Importing artists"):
 				artist_id = item['artist_id']
 
-				defaults = {
-						'name': item['artist_name']
-				}
+				if item['artist_name'] is not None:
+					defaults = {
+							'name': item['artist_name']
+					}
 
-				artist, created = Artist.objects.update_or_create(id=artist_id, defaults=defaults)
-				logger.debug("%s artist '%s'", "Added" if created else "Updated", defaults['name'])
+					artist, created = Artist.objects.update_or_create(id=artist_id, defaults=defaults)
+					logger.debug("%s artist '%s'", "Added" if created else "Updated", defaults['name'])
 		else:
 			logger.info("Database is already up-to-date")
 

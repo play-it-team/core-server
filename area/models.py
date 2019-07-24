@@ -64,7 +64,7 @@ class City(models.Model):
 	asciiName = models.CharField(max_length=200, db_index=True)
 	country = models.ForeignKey(to=Country, related_name='cities', on_delete=models.CASCADE)
 	region = models.ForeignKey(to=Region, related_name='cities', on_delete=models.CASCADE, null=True, blank=True)
-	location = models.PointField(null=True, blank=True)
+	location = models.PointField(null=True, blank=True, db_index=True)
 
 	class Meta:
 		ordering = ['name']
