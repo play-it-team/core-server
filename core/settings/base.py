@@ -56,7 +56,7 @@ LOCAL_APPS = [
 		'account',
 		'area',
 		'artist',
-		'genre'
+		'common',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
@@ -198,3 +198,13 @@ AVATAR_EXPOSE_USERNAME = config('AVATAR_EXPOSE_USERNAME', cast=bool)
 AVATAR_ALLOWED_FILE_EXTS = config('AVATAR_ALLOWED_FILE_EXTS', cast=str)
 AVATAR_CLEANUP_DELETED = config('AVATAR_CLEANUP_DELETED', cast=bool)
 AVATAR_RANDOMIZE_HASHNAMES = config('AVATAR_RANDOMIZE_HASHNAMES', cast=bool)
+
+# Minio Setting
+MINIO_SERVER = config('MINIO_SERVER', cast=str)
+MINIO_ACCESS_KEY = config('MINIO_ACCESS_KEY', cast=str)
+MINIO_SECRET_KEY = config('MINIO_SECRET_KEY', cast=str)
+MINIO_MEDIA_BUCKET = config('MINIO_MEDIA_BUCKET', cast=str)
+MINIO_STATIC_BUCKET = config('MINIO_STATIC_BUCKET', cast=str)
+MINIO_SECURE = config('MINIO_SECURE', cast=bool)
+DEFAULT_FILE_STORAGE = config('DEFAULT_FILE_STORAGE', cast=str)
+STATICFILES_STORAGE = config('STATICFILES_STORAGE', cast=str)

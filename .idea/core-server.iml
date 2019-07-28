@@ -19,6 +19,7 @@
       <sourceFolder url="file://$MODULE_DIR$/genre" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/plugin" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/account" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/common" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
