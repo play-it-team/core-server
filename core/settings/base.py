@@ -15,6 +15,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 
 from decouple import config
+from PIL import Image
 
 # Site ID
 SITE_ID = 1
@@ -52,8 +53,10 @@ DJANGO_APPS = [
 ]
 
 LOCAL_APPS = [
+		'account',
 		'area',
-		'artist'
+		'artist',
+		'genre'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
@@ -173,3 +176,25 @@ for static_dirs in STATICFILES_DIRS:
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+
+AUTH_USER_MODEL = 'auth.User'
+
+# Avatar Setting
+AVATAR_DEFAULT_SIZE = config('AVATAR_DEFAULT_SIZE', cast=int)
+AVATAR_RESIZE_METHOD = Image.ANTIALIAS
+AVATAR_STORAGE_DIR = config('AVATAR_STORAGE_DIR', cast=str)
+AVATAR_PATH_HANDLER = config('AVATAR_PATH_HANDLER', cast=str)
+AVATAR_GRAVATAR_BASE_URL = config('AVATAR_GRAVATAR_BASE_URL', cast=str)
+AVATAR_GRAVATAR_FIELD = config('AVATAR_GRAVATAR_FIELD', cast=str)
+AVATAR_GRAVATAR_FORCE_DEFAULT = config('AVATAR_GRAVATAR_FORCE_DEFAULT', cast=bool)
+AVATAR_DEFAULT_URL = config('AVATAR_DEFAULT_URL', cast=str)
+AVATAR_MAX_PER_USER = config('AVATAR_MAX_PER_USER', cast=int)
+AVATAR_MAX_SIZE = config('AVATAR_MAX_SIZE')
+AVATAR_THUMB_FORMAT = config('AVATAR_THUMB_FORMAT', cast=str)
+AVATAR_THUMB_QUALITY = config('AVATAR_THUMB_QUALITY', cast=int)
+AVATAR_HASH_FILENAMES = config('AVATAR_HASH_FILENAMES', cast=bool)
+AVATAR_HASH_USERDIRNAMES = config('AVATAR_HASH_USERDIRNAMES', cast=bool)
+AVATAR_EXPOSE_USERNAME = config('AVATAR_EXPOSE_USERNAME', cast=bool)
+AVATAR_ALLOWED_FILE_EXTS = config('AVATAR_ALLOWED_FILE_EXTS', cast=str)
+AVATAR_CLEANUP_DELETED = config('AVATAR_CLEANUP_DELETED', cast=bool)
+AVATAR_RANDOMIZE_HASHNAMES = config('AVATAR_RANDOMIZE_HASHNAMES', cast=bool)
