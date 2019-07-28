@@ -12,6 +12,8 @@ from django.utils.deconstruct import deconstructible
 from minio import Minio
 from minio.error import NoSuchBucket, NoSuchKey, ResponseError
 
+from common.files import ReadOnlySpooledTemporaryFile
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,6 +22,7 @@ class MinioStorage(Storage):
 	def __init__(self, client, bucket, *args, **kwargs):
 		self._client = client
 		self._bucket = bucket
+		self._file_class = ReadOnlySpooledTemporaryFile
 
 		if self._client:
 			if not client.bucket_exists(bucket_name=self._bucket):
@@ -81,6 +84,9 @@ class MinioStorage(Storage):
 
 	def url(self, name):
 		return self._client.presigned_url(bucket_name=self._bucket, object_name=name, method='GET')
+
+	def _open(self, name, mode='rb'):
+		return self._file_class(name=name, mode=mode, storage=self)
 
 	def path(self, name):
 		raise NotImplementedError("This backend doesn't support absolute paths.")

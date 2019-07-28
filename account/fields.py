@@ -1,9 +1,12 @@
 #  Copyright (c) 2019 - 2019. Abhimanyu Saharan <desk.abhimanyu@gmail.com> and the Play.It contributors
 
-from django.core.files.storage import default_storage
+from django.conf import settings
+from django.core.files.storage import get_storage_class
 from django.db import models
 
 from account.utils import avatar_file_path
+
+avatar_storage = get_storage_class(settings.DEFAULT_FILE_STORAGE)()
 
 
 class AvatarField(models.ImageField):
@@ -12,7 +15,7 @@ class AvatarField(models.ImageField):
 
 		self.max_length = 1024
 		self.upload_to = avatar_file_path
-		self.storage = default_storage
+		self.storage = avatar_storage
 		self.blank = True
 
 	def deconstruct(self):

@@ -122,10 +122,9 @@ class ActivationCode(models.Model):
 
 
 def create_default_thumbnail(sender, instance, created=False, **kwargs):
-	if created:
-		for size in AvatarSizeEnum.__iter__():
-			instance.create_thumbnail(size.value)
-		instance.create_thumbnail(settings.AVATAR_DEFAULT_SIZE)
+	for size in AvatarSizeEnum.__iter__():
+		instance.create_thumbnail(size.value)
+	instance.create_thumbnail(settings.AVATAR_DEFAULT_SIZE)
 
 
 def remove_avatar_images(instance=None, **kwargs):
