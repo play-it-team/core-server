@@ -11,6 +11,8 @@ services:
 
 before_install:
   - export DJANGO_SETTINGS_MODULE=core.settings.test
+  - sudo apt update
+  - sudo apt install -y gdal-bin libgdal-dev python3-gdal binutils libproj-dev postgresql-10-postgis-2.4 postgis
 
 before_script:
   - psql -c "CREATE DATABASE travisci;" -U postgres
