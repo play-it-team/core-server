@@ -90,6 +90,8 @@ class DatabaseBackend(BaseHealthCheckBackend):
 
 
 class CacheBackend(BaseHealthCheckBackend):
+	critical_service = False
+
 	def check_status(self):
 		try:
 			cache.set('play_it_health_check', 'working', 1)
