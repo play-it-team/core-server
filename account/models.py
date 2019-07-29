@@ -2,15 +2,15 @@
 
 import logging
 
+import six
+from PIL import Image
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models import signals
-from django.utils import six
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
-from PIL import Image
 
 from account.enums import AccountGender, AvatarSizeEnum
 from account.fields import AvatarField
