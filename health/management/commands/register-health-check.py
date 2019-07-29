@@ -44,11 +44,19 @@ class Command(BaseCommand):
 		}
 		Service.objects.update_or_create(slug='memory', defaults=memory_defaults)
 
+		storage_defaults = {
+				'name':        'Storage',
+				'description': 'This service checks the storage.',
+				'status':      HealthStatusEnum.red.name,
+				'order':       4
+		}
+		Service.objects.update_or_create(slug='storage', defaults=storage_defaults)
+
 		celery_defaults = {
 				'name':        'Periodic Tasks',
 				'description': 'This service checks the periodic tasks functionality.',
 				'status':      HealthStatusEnum.red.name,
-				'order':       4
+				'order':       5
 		}
 		Service.objects.update_or_create(slug='celery', defaults=celery_defaults)
 
@@ -56,6 +64,6 @@ class Command(BaseCommand):
 				'name':        'Rabbit MQ',
 				'description': 'This service checks the Rabbit MQ server connectivity.',
 				'status':      HealthStatusEnum.red.name,
-				'order':       5
+				'order':       6
 		}
 		Service.objects.update_or_create(slug='rabbit-mq', defaults=rabbit_mq_defaults)

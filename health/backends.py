@@ -1,12 +1,15 @@
 #  Copyright (c) 2019 - 2019. Abhimanyu Saharan <desk.abhimanyu@gmail.com> and the Play.It contributors
 import logging
 import socket
+import uuid
 from timeit import default_timer
 
 import psutil
 from amqp.exceptions import AccessRefused
 from django.conf import settings
 from django.core.cache import cache, CacheKeyWarning
+from django.core.files.base import ContentFile
+from django.core.files.storage import get_storage_class
 from django.db import DatabaseError, IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from kombu import Connection
@@ -162,3 +165,45 @@ class RabbitMQBackend(BaseHealthCheckBackend):
 			self.add_error(ServiceUnavailable('Unknown Error'), e)
 		else:
 			logger.debug('Connection established')
+
+
+class StorageBackend(BaseHealthCheckBackend):
+	storage = settings.DEFAULT_FILE_STORAGE
+
+	def get_storage(self):
+		if isinstance(self.storage, str):
+			return get_storage_class(self.storage)()
+		else:
+			return self.storage
+
+	def get_file_name(self):
+		return 'play_it_health_check/test-%s.txt' % uuid.uuid4()
+
+	def get_file_content(self):
+		return 'Working'
+
+	def check_save(self, file_name, file_content):
+		storage = self.get_storage()
+		file_name = storage.save(file_name, ContentFile(file_content))
+		if not storage.exists(file_name):
+			self.add_error(ServiceUnavailable('File does not exist'))
+		with storage.open(file_name) as f:
+			if not f.read() == file_content:
+				self.add_error(ServiceUnavailable('File content does not match'))
+		return file_name
+
+	def check_delete(self, file_name):
+		storage = self.get_storage()
+		storage.delete(file_name)
+		if storage.exists(file_name):
+			self.add_error(ServiceUnavailable('File was not deleted'))
+
+	def check_status(self):
+		try:
+			file_name = self.get_file_name()
+			file_content = self.get_file_content()
+			file_name = self.check_save(file_name=file_name, file_content=file_content)
+			self.check_delete(file_name)
+			return True
+		except Exception as e:
+			self.add_error(ServiceUnavailable('Unknown Error'), e)
