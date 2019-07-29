@@ -1,15 +1,11 @@
 #  Copyright (c) 2019 - 2019. Abhimanyu Saharan <desk.abhimanyu@gmail.com> and the Play.It contributors
 
-from django.urls import include, path
-from rest_framework import routers
+from django.urls import include, re_path
 
-from health import views
+from health.api.base.routers import api_urlpatterns as api_v1
 
 app_name = 'health'
 
-router = routers.DefaultRouter()
-router.register(r'services', views.ServiceViewSet)
-
 urlpatterns = [
-		path('', include(router.urls)),
+		re_path(r'^v1/', include(api_v1)),
 ]
