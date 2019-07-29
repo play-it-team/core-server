@@ -57,6 +57,7 @@ LOCAL_APPS = [
 		'area',
 		'artist',
 		'common',
+		'health'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS

@@ -115,12 +115,6 @@ class Avatar(models.Model):
 		return self.avatar_url(settings.AVATAR_DEFAULT_SIZE)
 
 
-class ActivationCode(models.Model):
-	account = models.ForeignKey(to=Account, verbose_name=_('Account'), on_delete=models.CASCADE)
-	code = models.CharField(verbose_name=_('Code'), max_length=64, unique=True)
-	expiry = models.DateTimeField(verbose_name=_('Expiry Date'), null=True, blank=True)
-
-
 def create_default_thumbnail(sender, instance, created=False, **kwargs):
 	for size in AvatarSizeEnum.__iter__():
 		instance.create_thumbnail(size.value)
