@@ -52,6 +52,11 @@ DJANGO_APPS = [
 		'django.contrib.gis'
 ]
 
+THIRD_PARTY_APPS = [
+		'rest_framework',
+		'guardian',
+]
+
 LOCAL_APPS = [
 		'account',
 		'area',
@@ -60,7 +65,7 @@ LOCAL_APPS = [
 		'health'
 ]
 
-INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 DJANGO_SECURITY_MIDDLEWARE = [
 		'django.middleware.security.SecurityMiddleware',
@@ -80,9 +85,15 @@ DJANGO_MIDDLEWARE = [
 		'django.middleware.clickjacking.XFrameOptionsMiddleware',
 		'django.middleware.common.CommonMiddleware',
 		'django.middleware.http.ConditionalGetMiddleware',
+		'django.middleware.locale.LocaleMiddleware'
 ]
 
 MIDDLEWARE = DJANGO_SECURITY_MIDDLEWARE + DJANGO_CACHE_MIDDLEWARE + DJANGO_MIDDLEWARE
+
+AUTHENTICATION_BACKENDS = [
+		'django.contrib.auth.backends.ModelBackend',
+		'guardian.backends.ObjectPermissionBackend'
+]
 
 ROOT_URLCONF = 'core.urls'
 
@@ -215,3 +226,31 @@ HEALTH_CHECK_DISK_USAGE_MAX = config('HEALTH_CHECK_DISK_USAGE_MAX', cast=int)
 HEALTH_CHECK_MEMORY_USAGE_MAX = config('HEALTH_CHECK_MEMORY_USAGE_MAX', cast=int)
 HEALTH_CHECK_WARNINGS_AS_ERRORS = config('HEALTH_CHECK_WARNINGS_AS_ERRORS', cast=bool)
 HEALTH_CHECK_CELERY_TIMEOUT = config('HEALTH_CHECK_CELERY_TIMEOUT', cast=int)
+
+# Rest Framework Setting
+REST_FRAMEWORK = {
+		'DEFAULT_AUTHENTICATION_CLASSES': [
+				'rest_framework.authentication.BasicAuthentication',
+				'rest_framework.authentication.SessionAuthentication'
+		],
+		'DEFAULT_FILTER_BACKENDS':        [
+				'rest_framework_guardian.filters.DjangoObjectPermissionsFilter'
+		],
+		'DEFAULT_THROTTLE_CLASSES':       [
+				'rest_framework.throttling.AnonRateThrottle',
+				'rest_framework.throttling.UserRateThrottle'
+		],
+		'DEFAULT_THROTTLE_RATES':         {
+				'anon': '10/day',
+				'user': '1000/day'
+		},
+		'DEFAULT_METADATA_CLASS':         'rest_framework.metadata.SimpleMetadata',
+		'DEFAULT_PAGINATION_CLASS':       'rest_framework.pagination.LimitOffsetPagination',
+		'PAGE_SIZE':                      100,
+		'DEFAULT_PERMISSION_CLASSES':     [
+				'common.permissions.CommonObjectPermissions'
+		],
+		'DEFAULT_VERSIONING_CLASS':       'rest_framework.versioning.NamespaceVersioning',
+}
+
+ANONYMOUS_USER_NAME = None
