@@ -8,7 +8,7 @@ from health.models import Event, EventUpdate, Service
 # Register your models here.
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-	list_display = ('name', 'get_status', 'order', 'updated_on')
+	list_display = ('name', 'get_status', 'description', 'order', 'updated_on')
 	search_fields = ('name', 'description')
 	prepopulated_fields = {'slug': ('name',)}
 	exclude = ('created_on', 'updated_on')

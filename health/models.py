@@ -182,6 +182,10 @@ class EventUpdate(EventBase):
 		return self.event.services.values_list('slug', 'name')
 
 
+class DatabaseTestModel(models.Model):
+	name = models.CharField(max_length=10)
+
+
 signals.post_save.connect(Service.handle_event_save, sender=Event)
 signals.post_save.connect(Event.handle_update_save, sender=EventUpdate)
 signals.m2m_changed.connect(Service.handle_event_m2m_save, sender=Event.services.through)

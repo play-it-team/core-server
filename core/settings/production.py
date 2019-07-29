@@ -71,6 +71,16 @@ LOGGING = {
 						'handlers':  ['console', 'file', 'mail_admins'],
 						'propagate': True,
 						'level':     DJANGO_LOG_LEVEL
+				},
+				'common': {
+						'handlers':  ['console', 'file', 'mail_admins'],
+						'propagate': True,
+						'level':     DJANGO_LOG_LEVEL
+				},
+				'health': {
+						'handlers':  ['console', 'file', 'mail_admins'],
+						'propagate': True,
+						'level':     DJANGO_LOG_LEVEL
 				}
 		}
 }
