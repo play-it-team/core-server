@@ -14,8 +14,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
-from decouple import config
 from PIL import Image
+from decouple import config
 
 # Site ID
 SITE_ID = 1
@@ -53,8 +53,9 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-		'rest_framework',
-		'guardian',
+	'rest_framework',
+	'guardian',
+	'jet_django'
 ]
 
 LOCAL_APPS = [
@@ -245,12 +246,16 @@ REST_FRAMEWORK = {
 				'user': '1000/day'
 		},
 		'DEFAULT_METADATA_CLASS':         'rest_framework.metadata.SimpleMetadata',
-		'DEFAULT_PAGINATION_CLASS':       'rest_framework.pagination.LimitOffsetPagination',
-		'PAGE_SIZE':                      100,
-		'DEFAULT_PERMISSION_CLASSES':     [
-				'common.permissions.CommonObjectPermissions'
-		],
-		'DEFAULT_VERSIONING_CLASS':       'rest_framework.versioning.NamespaceVersioning',
+	'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+	'PAGE_SIZE': 100,
+	'DEFAULT_PERMISSION_CLASSES': [
+		'common.permissions.CommonObjectPermissions'
+	],
+	'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
 }
 
 ANONYMOUS_USER_NAME = None
+
+# Jet Settings
+JET_PROJECT = 'play_it_2'
+JET_TOKEN = 'b8639b97-312c-49cf-a239-1d16f1496cfa'
