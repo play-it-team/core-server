@@ -54,8 +54,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
 	'rest_framework',
-	'guardian',
-	'jet_django'
+	'guardian'
 ]
 
 LOCAL_APPS = [
