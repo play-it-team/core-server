@@ -76,7 +76,7 @@ class Account(models.Model):
             kwargs = {"primary": True}
             if confirm_email is not None:
                 kwargs["confirm"] = confirm_email
-            EmailAddress.objects.add_email(account.user, account.user.email, **kwargs)
+            EmailAddress.objects.add_email(account, account.user.email, **kwargs)
 
         return account
 
