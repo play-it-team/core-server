@@ -1,7 +1,6 @@
-#  Copyright (c) 2019 - 2019. Abhimanyu Saharan <desk.abhimanyu@gmail.com> and the Play.It contributors
+#  Copyright (c) 2019 - 2020. Abhimanyu Saharan <desk.abhimanyu@gmail.com> and the Play.It contributors
 
 from django.contrib.gis.db import models
-
 
 # Create your models here.
 class Continent(models.Model):
