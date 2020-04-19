@@ -21,7 +21,6 @@ before_install:
 before_script:
   - psql -c "CREATE DATABASE travisci;" -U postgres
   - cp .env.test .env
-  - cp .admins.example .admins
 
 install:
   - pip install -r requirements/test.txt
