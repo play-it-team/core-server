@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.template.loader import render_to_string
 
-from account.models import Avatar
+from account.models import Account, AccountDeletion, EmailAddress, PasswordExpiry, PasswordHistory, SignupCode, Avatar
 from account.signals import avatar_updated
 
 
@@ -35,18 +35,6 @@ class AvatarAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super(AvatarAdmin, self).save_model(request, obj, form, change)
         avatar_updated.send(sender=Avatar, account=request.user, avatar=obj)
-
-
-from django.contrib import admin
-
-from account.models import (
-    Account,
-    AccountDeletion,
-    EmailAddress,
-    PasswordExpiry,
-    PasswordHistory,
-    SignupCode,
-)
 
 
 class SignupCodeAdmin(admin.ModelAdmin):
