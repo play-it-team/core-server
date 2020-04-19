@@ -46,6 +46,7 @@ class SignupCodeAdmin(admin.ModelAdmin):
 
 class AccountAdmin(admin.ModelAdmin):
     raw_id_fields = ["user"]
+    list_display = ['user', 'language', 'dob', 'gender', 'timezone']
 
 
 class AccountDeletionAdmin(AccountAdmin):
@@ -65,7 +66,7 @@ class PasswordHistoryAdmin(admin.ModelAdmin):
     raw_id_fields = ["user"]
     list_display = ["user", "timestamp"]
     list_filter = ["user"]
-    ordering = ["user__username", "-timestamp"]
+    ordering = ["user__user__username", "-timestamp"]
 
 
 admin.site.register(Account, AccountAdmin)
